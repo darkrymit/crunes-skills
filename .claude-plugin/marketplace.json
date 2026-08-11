@@ -1,0 +1,19 @@
+{
+  "name": "crunes-skills",
+  "description": "Agent skills for the crunes CLI.",
+  "owner": {
+    "name": "DarkRymit"
+  },
+  "plugins": [
+    {
+      "name": "crunes-skills",
+      "description": "Agent skills for writing and running crunes — sandboxed project-local scripts for AI coding agents.",
+      "version": "0.1.0",
+      "author": {
+        "name": "DarkRymit"
+      },
+      "source": "./",
+      "category": "development"
+    }
+  ]
+}

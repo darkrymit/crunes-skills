@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate manifests are parseable JSON
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('.claude-plugin/plugin.json','utf8'))"
+          node -e "JSON.parse(require('fs').readFileSync('.claude-plugin/marketplace.json','utf8'))"
+      - name: Validate every skill has name and description frontmatter
+        run: |
+          for f in skills/*/SKILL.md; do
+            head -5 "$f" | grep -q '^name: ' || { echo "missing name: $f"; exit 1; }
+            head -5 "$f" | grep -q '^description: ' || { echo "missing description: $f"; exit 1; }
+          done
+      - name: Enforce length budget
+        run: |
+          test "$(wc -l < skills/crunes/SKILL.md)" -le 120 || { echo "dispatch skill over 120 lines"; exit 1; }
+          for f in skills/crunes-*/SKILL.md; do
+            test "$(wc -l < "$f")" -le 200 || { echo "over 200 lines: $f"; exit 1; }
+          done

@@ -1,0 +1,12 @@
+# local overrides (machine-specific, never commit)
+config.local.json
+project.local.json
+
+# run logs
+logs/
+
+# local caches, databases, schemas, and job state (generated)
+caches/
+sqlite/
+schemas/
+jobs/

@@ -1,0 +1,30 @@
+{
+  "runes": {
+    "release": {
+      "path": ".crunes/runes/release.js",
+      "name": "Release Automator",
+      "description": "Bump crunes-skills version, update the changelog, and tag Git releases automatically.",
+      "permissions": {
+        "run": {
+          "allow": [
+            "fs.read:.claude-plugin/plugin.json",
+            "fs.read:.claude-plugin/marketplace.json",
+            "fs.read:CHANGELOG.md",
+            "fs.write:.claude-plugin/plugin.json",
+            "fs.write:.claude-plugin/marketplace.json",
+            "fs.write:CHANGELOG.md",
+            "shell.run:git log *",
+            "shell.run:git rev-parse *",
+            "shell.run:git describe *",
+            "shell.run:git rev-list *",
+            "shell.run:git add .claude-plugin/plugin.json",
+            "shell.run:git add .claude-plugin/marketplace.json",
+            "shell.run:git add CHANGELOG.md",
+            "shell.run:git commit *",
+            "shell.run:git tag *"
+          ]
+        }
+      }
+    }
+  }
+}
