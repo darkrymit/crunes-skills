@@ -1,11 +1,11 @@
 {
   "runes": {
     "release": {
-      "path": ".crunes/runes/release.js",
       "name": "Release Automator",
       "description": "Bump crunes-skills version, update the changelog, and tag Git releases automatically.",
-      "permissions": {
-        "run": {
+      "run": {
+        "command": ".crunes/runes/release.rune.js",
+        "permissions": {
           "allow": [
             "fs.read:.claude-plugin/plugin.json",
             "fs.read:.claude-plugin/marketplace.json",

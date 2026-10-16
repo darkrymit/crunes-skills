@@ -5,7 +5,7 @@ description: Use when working in a project that has a .crunes directory, when as
 
 # crunes
 
-Runes are project-local JavaScript modules that execute in a sandbox and return structured output. You reach them through the `crunes` CLI. Assumes `crunes >= 0.8.5` — check with `crunes --version`.
+Runes are project-local JavaScript modules that execute in a sandbox and return structured output. You reach them through the `crunes` CLI. Assumes `crunes >= 0.10.0` — check with `crunes --version`.
 
 ## Orient
 
