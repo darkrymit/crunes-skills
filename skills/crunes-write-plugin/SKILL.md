@@ -53,6 +53,8 @@ Note the directory is `.crunes-plugin/`. Nothing is found by convention: each ru
 
 The `permissions` inside each block are what the installing user is shown and consents to. Declare the narrowest set that works — a plugin asking for `fs.write:./**` is one most people should decline. Blocks behave exactly as in a project config: a rune has a REPL only with a `repl` block, and `repl` does not inherit from `run`. A format `"1"` manifest is refused; `crunes migrate --plugin <dir>` rewrites it. See `crunes-permissions` for scope grammar.
 
+A rune's `run` block may also name a script or program in the plugin, which runs natively with the user's full access. Installing the plugin does not make it runnable: each user must review and trust it with `crunes plugin trust <plugin> [rune]`, and any change to the script, its command or its schema needs trusting again — so a plugin that ships one should say in its README why it cannot be an isolate rune. Check what a manifest declares with `crunes -p docs rune <plugin>:<rune>`.
+
 ## Writing the runes themselves
 
 Plugin runes are ordinary runes — same exports, same `@utils`, same sandbox. See `crunes-write-rune`. Two differences:
