@@ -34,7 +34,7 @@ Note the directory is `.crunes-plugin/`. Nothing is found by convention: each ru
 
 ```json
 {
-  "format": "2",
+  "format": "1",
   "runes": {
     "example": {
       "name": "Example Rune",
