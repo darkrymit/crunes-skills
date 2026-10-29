@@ -5,7 +5,7 @@ description: Use when a rune hits a permission denial, when writing or widening 
 
 # Rune Permissions
 
-Runes have no ambient access to anything. Every capability — reading a file, globbing, running a command, opening a socket — is a scope string declared in `.crunes/config.json`. Assumes `crunes >= 0.8.5` — check with `crunes --version`.
+Runes have no ambient access to anything. Every capability — reading a file, globbing, running a command, opening a socket — is a scope string declared in `.crunes/config.json`. Assumes `crunes >= 0.10.0` — check with `crunes --version`.
 
 ## Fix a denial in three steps
 
@@ -22,9 +22,9 @@ A denial looks like this:
 {
   "runes": {
     "perm": {
-      "path": ".crunes/runes/perm.js",
-      "permissions": {
-        "run": { "allow": ["fs.glob:*.md", "shell.run:git *"] }
+      "run": {
+        "command": ".crunes/runes/perm.rune.js",
+        "permissions": { "allow": ["fs.glob:*.md", "shell.run:git *"] }
       }
     }
   }
@@ -79,26 +79,24 @@ redirects:
 
 Every pipeline stage needs its own grant, and a redirect target needs an `fs.write` — not a `shell.run`. Run this before widening a shell scope; the answer is often that you granted one stage of three.
 
-## Lifecycle blocks do not inherit
+## Grants live in the block they apply to
 
-`permissions` is keyed by lifecycle: `run` and `repl`. **`repl` does not inherit from `run`.** A rune that reads the same file in both modes lists the scope twice:
+Grants sit inside the `run` block, and inside the `repl` block for a rune with a REPL. **`repl` does not inherit from `run`.** A rune that reads the same file in both modes lists the scope twice:
 
 ```json
-"permissions": {
-  "run":  { "allow": ["sqlite.read:./state::db"] },
-  "repl": { "allow": ["sqlite.read:./state::db", "sqlite.write:./state::db"] }
-}
+"run":  { "command": ".crunes/runes/db.rune.js", "permissions": { "allow": ["sqlite.read:./state::db"] } },
+"repl": { "command": ".crunes/runes/db.rune.js", "permissions": { "allow": ["sqlite.read:./state::db", "sqlite.write:./state::db"] } }
 ```
 
-`deny` is available alongside `allow` in either block and is checked first.
+`deny` is available alongside `allow` in either block and is checked first. A script rune — a `run` command that is not a `*.rune.js` module — runs natively with full access, so crunes refuses grants on it rather than imply a sandbox. An entry still written with `path` or `permissions.run` is refused; `crunes migrate` rewrites it.
 
 ## Batching is a separate gate
 
-`crunes run -b` is refused with `Batch not permitted for "<key>"` unless the rune's config entry declares a `batch` block. It sits beside `path`, not inside `permissions`:
+`crunes run -b` is refused with `Batch not permitted for "<key>"` unless the rune's config entry declares a `batch` block. It sits beside `run`, not inside it:
 
 ```json
 "demo": {
-  "path": ".crunes/runes/demo.js",
+  "run": ".crunes/runes/demo.rune.js",
   "batch": { "allow": ["*"], "deny": [] }
 }
 ```
@@ -129,7 +127,7 @@ Plugin runes have no `runes.<key>` entry of their own. To give one project-side 
   "runes": {
     "my-market@my-plugin:deploy": {
       "vars": { "region": "us-east-1" },
-      "permissions": { "run": { "allow": ["fs.read:src/**"] } }
+      "run": { "permissions": { "allow": ["fs.read:src/**"] } }
     }
   }
 }
@@ -138,9 +136,9 @@ Plugin runes have no `runes.<key>` entry of their own. To give one project-side 
 This key must **always** carry the marketplace prefix. A bare `"my-plugin:deploy"` is not merely ambiguous — it makes the whole config unreadable:
 
 ```
-[err] Config unreadable: config.json: runes["my-plugin:deploy"] has no path or plugin,
-so it can only be a plugin-rune override — but "my-plugin" is missing the marketplace
-prefix. Use the full "marketplace@plugin:deploy" form.
+[err] Config unreadable: config.json: runes["my-plugin:deploy"] is a plugin-rune override
+— but "my-plugin" is missing the marketplace prefix. Use the full
+"marketplace@plugin:deploy" form.
 ```
 
 Plugin runes always hold read access to their own plugin directory. Everything else is declared in the plugin manifest and consented to at install time.

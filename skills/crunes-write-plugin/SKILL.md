@@ -5,7 +5,7 @@ description: Use when packaging runes into a crunes plugin, writing a plugin man
 
 # Writing Plugins
 
-A plugin packages runes and templates so other projects can install them. Assumes `crunes >= 0.8.5` — check with `crunes --version`.
+A plugin packages runes and templates so other projects can install them. Assumes `crunes >= 0.10.0` — check with `crunes --version`.
 
 Reach for a plugin only when the logic is *not* specific to one project. Anything that reads this repo's layout, its config, or its conventions belongs in `.crunes/runes/` as a local rune. A plugin earns its packaging when several projects would install the same thing.
 
@@ -23,24 +23,25 @@ That produces:
 <name>/
   .crunes-plugin/plugin.json         rune and template declarations, permissions
   .crunes-plugin/marketplace.json    the marketplace entry for this plugin
-  runes/example.js
+  runes/example.rune.js
   templates/example-template.js
   README.md  CHANGELOG.md
 ```
 
-Note the directory is `.crunes-plugin/`, and that rune files are found by convention at `runes/<key>.js` — plugin manifests declare no `path` field.
+Note the directory is `.crunes-plugin/`. Nothing is found by convention: each rune names its module in a `run` block, and the `.rune.js` suffix is what runs it in the sandbox.
 
 ## plugin.json
 
 ```json
 {
-  "format": "1",
+  "format": "2",
   "runes": {
     "example": {
       "name": "Example Rune",
       "description": "Replace with your rune description",
-      "permissions": {
-        "run": { "allow": [], "deny": [] }
+      "run": {
+        "command": "runes/example.rune.js",
+        "permissions": { "allow": [], "deny": [] }
       }
     }
   },
@@ -50,7 +51,9 @@ Note the directory is `.crunes-plugin/`, and that rune files are found by conven
 }
 ```
 
-The `permissions` block here is what the installing user is shown and consents to. Declare the narrowest set that works — a plugin asking for `fs.write:./**` is one most people should decline. Lifecycle keys behave exactly as in a project config: `repl` does not inherit from `run`. See `crunes-permissions` for scope grammar.
+The `permissions` inside each block are what the installing user is shown and consents to. Declare the narrowest set that works — a plugin asking for `fs.write:./**` is one most people should decline. Blocks behave exactly as in a project config: a rune has a REPL only with a `repl` block, and `repl` does not inherit from `run`. A format `"1"` manifest is refused; `crunes migrate --plugin <dir>` rewrites it. See `crunes-permissions` for scope grammar.
+
+A rune's `run` block may also name a script or program in the plugin, which runs natively with the user's full access. Installing the plugin does not make it runnable: each user must review and trust it with `crunes plugin trust <plugin> [rune]`, and any change to the script, its command or its schema needs trusting again — so a plugin that ships one should say in its README why it cannot be an isolate rune. Check what a manifest declares with `crunes -p docs rune <plugin>:<rune>`.
 
 ## Writing the runes themselves
 

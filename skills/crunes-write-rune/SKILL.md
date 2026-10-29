@@ -5,7 +5,7 @@ description: Use when creating a new rune, editing an existing one, scaffolding 
 
 # Writing Runes
 
-A rune is an ESM module that executes inside an `isolated-vm` sandbox. There is no access to Node builtins — all I/O goes through `@utils`, and every capability must be granted in `.crunes/config.json`. Assumes `crunes >= 0.8.5` — check with `crunes --version`.
+A rune is an ESM module that executes inside an `isolated-vm` sandbox. There is no access to Node builtins — all I/O goes through `@utils`, and every capability must be granted in `.crunes/config.json`. Assumes `crunes >= 0.10.0` — check with `crunes --version`.
 
 ## Scaffold
 
@@ -15,7 +15,7 @@ crunes -p template list
 crunes -p template apply <template> --as <key>
 ```
 
-`create` writes `.crunes/runes/<key>.js` and registers it in `.crunes/config.json` for you. Use `-g` to place the rune in `~/.crunes/` instead, making it callable from any directory.
+`create` writes `.crunes/runes/<key>.rune.js` and registers it in `.crunes/config.json` as the entry's `run` block for you. Use `-g` to place the rune in `~/.crunes/` instead, making it callable from any directory.
 
 ## Imports
 
@@ -118,7 +118,7 @@ export async function inputRepl(input) {
 Three traps:
 
 - `argsRepl` does **not** fall back to `args`. If it is absent, `repl(args)` receives an empty object.
-- REPL capabilities come from a separate `"repl"` permission block, which does **not** inherit from `"run"`. A rune that reads files in both modes must list those scopes twice. See `crunes-permissions`.
+- A rune has a REPL only when its config entry declares a `"repl"` block naming the module. Its grants live in that block and do **not** inherit from `"run"`, so a rune that reads files in both modes lists those scopes twice. See `crunes-permissions`.
 - `inputRepl` receives typed events — `line`, `command`, `interrupt`, `eof`. Return `{ type: 'done' }` to end the session, `{ type: 'prompt', value }` to change the prompt, or nothing to continue.
 
 ## Test loop
