@@ -42,7 +42,7 @@ Verify any of these against the real CLI with `crunes -p run --help`.
 crunes -p run -b "demo[-s example-md]" + other-rune arg
 ```
 
-Without a `batch` block in the rune's config entry this fails with `Batch not permitted for "<key>"`. The fix is a `"batch": { "allow": ["*"] }` entry alongside the rune's `path`; patterns match the argument string after the key, and `deny` is checked first. See `crunes-permissions`.
+Without a `batch` block in the rune's config entry this fails with `Batch not permitted for "<key>"`. The fix is a `"batch": { "allow": ["*"] }` block alongside `run` in the rune's config entry; patterns match the argument string after the key, and `deny` is checked first. See `crunes-permissions`.
 
 ### Key prefixes
 
