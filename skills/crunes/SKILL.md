@@ -5,7 +5,7 @@ description: Use when working in a project that has a .crunes directory, when as
 
 # crunes
 
-Runes are project-local JavaScript modules that execute in a sandbox and return structured output. You reach them through the `crunes` CLI. Assumes `crunes >= 0.10.0` — check with `crunes --version`.
+Runes are tools registered in project or global config and reached through the `crunes` CLI. They run either in an `isolated-vm` sandbox (ESM modules using `@utils` with declared permissions) or natively as script runes (Node, Python, bash, or direct CLI programs). Assumes `crunes >= 0.10.0` — check with `crunes --version`.
 
 ## Orient
 
@@ -29,7 +29,7 @@ Four things the parser will not forgive:
 
 1. **Global flags go before `run`.** `crunes --cwd . -p run demo` works; `crunes run --cwd . demo` fails with `Unknown option or misplaced flag`.
 2. **Section filters live only inside the key brackets.** `demo[-s example-md]` works. Before the key it is rejected as misplaced; *after* the key it is silently handed to the rune as a raw argument.
-3. **`--help` is not intercepted.** If a rune does not declare its own help option and check it, `crunes run demo --help` **executes the rune for real**. To inspect a rune without running it, use `crunes -p docs rune <key>`.
+3. **`--help` is not intercepted for isolate runes without a schema.** If an isolate rune does not declare its own help option and check it, `crunes run demo --help` **executes the rune for real**. (Script runes with a declared `args` schema have `--help` intercepted and handled by the CLI). To inspect any rune without running it, use `crunes -p docs rune <key>`.
 4. **An unmatched subcommand does not error.** It falls through to the root with the unknown token in `args.$rest`.
 
 Verify any of these against the real CLI with `crunes -p run --help`.

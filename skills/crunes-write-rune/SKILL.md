@@ -5,17 +5,28 @@ description: Use when creating a new rune, editing an existing one, scaffolding 
 
 # Writing Runes
 
-A rune is an ESM module that executes inside an `isolated-vm` sandbox. There is no access to Node builtins — all I/O goes through `@utils`, and every capability must be granted in `.crunes/config.json`. Assumes `crunes >= 0.10.0` — check with `crunes --version`.
+Crunes supports two execution tiers. Assumes `crunes >= 0.10.0` — check with `crunes --version`.
+
+- **Isolate Runes**: Sandboxed ESM modules (`.rune.js`) executed inside an `isolated-vm` V8 isolate. Zero Node built-ins; all I/O goes through `@utils`, and capabilities are strictly governed by permission grants in `.crunes/config.json`. Ideal for portable utilities, data extraction, and marketplace plugins.
+- **Script Runes**: Native scripts (`bash`, `python`, `node`) or direct CLI programs. Run with the caller's full native permissions (no permission grants allowed). Ideal for host environment tooling, git wrappers, complex shell pipelines, or scripts requiring project packages/virtualenvs.
 
 ## Scaffold
 
 ```bash
-crunes -p -y create <key> --format markdown     # --format is required non-interactively
+# Isolate rune (sandboxed ESM)
+crunes -p -y create <key> --format markdown     # writes .crunes/runes/<key>.rune.js
+
+# Script rune (native process)
+crunes -p -y create <key> --lang bash           # writes .crunes/runes/<key>.sh
+crunes -p -y create <key> --lang python         # writes .crunes/runes/<key>.py
+crunes -p -y create <key> --lang node           # writes .crunes/runes/<key>.js
+
+# From a template
 crunes -p template list
 crunes -p template apply <template> --as <key>
 ```
 
-`create` writes `.crunes/runes/<key>.rune.js` and registers it in `.crunes/config.json` as the entry's `run` block for you. Use `-g` to place the rune in `~/.crunes/` instead, making it callable from any directory.
+`create` writes the file and registers its `run` block in `.crunes/config.json`. Pass `-g` to scaffold globally under `~/.crunes/` instead.
 
 ## Imports
 
@@ -120,6 +131,55 @@ Three traps:
 - `argsRepl` does **not** fall back to `args`. If it is absent, `repl(args)` receives an empty object.
 - A rune has a REPL only when its config entry declares a `"repl"` block naming the module. Its grants live in that block and do **not** inherit from `"run"`, so a rune that reads files in both modes lists those scopes twice. See `crunes-permissions`.
 - `inputRepl` receives typed events — `line`, `command`, `interrupt`, `eof`. Return `{ type: 'done' }` to end the session, `{ type: 'prompt', value }` to change the prompt, or nothing to continue.
+
+## Script Runes
+
+A script rune names an executable script (`.sh`, `.py`, `.js`) or a program on `PATH` in its `run` block. Grants inside `run` are refused because scripts run natively with full access:
+
+```json
+"run": {
+  "command": "scripts/deploy.sh",
+  "argv": ["--region", "eu"]
+}
+```
+
+### Interpreter resolution
+Crunes resolves the interpreter automatically:
+- **Node**: The Node binary crunes itself runs on.
+- **Python**: Resolves `CRUNES_PYTHON`, active `VIRTUAL_ENV`, project `.venv/` or `venv/`, or system Python (`python3`/`python`/`py -3`).
+- **bash**: Resolves `CRUNES_BASH`, Git Bash on Windows, or system `bash`.
+- **Program on PATH or direct executable**: Invoked directly.
+
+### What the script receives
+- **Working directory**: The project root.
+- **Environment variables**:
+  - `CRUNES_PROJECT_ROOT`: Absolute project root path.
+  - `CRUNES_RUNE_KEY`: The key the rune was invoked by.
+  - `CRUNES_LIFECYCLE`: `run`.
+  - `CRUNES_VARS`: Entry `vars` as JSON string (`{}` if none).
+  - `CRUNES_ARGS`: Parsed arguments JSON (only when an `args` schema is declared).
+- **Arguments**: Passed directly to the script (prefixed by `argv` if configured).
+
+### Argument validation & schemas
+- **Without schema**: All arguments pass through unchanged, including `--help`.
+- **With `args` block** (inline JSON or path to a `.json` file): Crunes validates types, required options, and choices before spawning. It handles `--help` directly so help never executes the script.
+
+```json
+"run": { "command": "scripts/query.py" },
+"args": {
+  "options": [
+    { "flags": "-u, --user <name>", "description": "Target username", "required": true },
+    { "flags": "--limit <n>", "type": "integer", "default": 10 }
+  ]
+}
+```
+
+With `"pass": "mapped"`, caller flags are translated to the program's native CLI tokens using `"to": "-n{value}"` mappings.
+
+### Output modes
+- **Direct single run**: stdout, stderr, and stdin connect directly to the user's terminal. Exit codes pass straight through.
+- **Framed run** (batch `-b`, JSONL, background job, `bench`): stdout is captured as the result string; stderr conveys diagnostics.
+- **Structured sections**: Declare `"output": "sections"` in the `run` block. Any stdout line matching `{"type": "section", "section": {"name": "...", "data": {"type": "markdown", "content": "..."}}}` is parsed and rendered as a structured section.
 
 ## Test loop
 
