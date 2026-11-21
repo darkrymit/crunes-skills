@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.10.1] - 2026-11-21
+
+### Removed
+- **Config migration reference**: Drop `crunes migrate` mention from `crunes-permissions`
+
 ## [0.10.0] - 2026-11-21
 
 ### Added
