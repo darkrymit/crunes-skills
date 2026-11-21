@@ -88,7 +88,7 @@ Grants sit inside the `run` block, and inside the `repl` block for a rune with a
 "repl": { "command": ".crunes/runes/db.rune.js", "permissions": { "allow": ["sqlite.read:./state::db", "sqlite.write:./state::db"] } }
 ```
 
-`deny` is available alongside `allow` in either block and is checked first. An isolate rune can declare `"allow": ["*"]` for unrestricted access across all capabilities, with `deny` still enforcing exclusions (e.g. `"allow": ["*"], "deny": ["fs.write:.env*"]`). A script rune — a `run` command that is not a `*.rune.js` module — runs natively with full access, so crunes refuses grants on it rather than imply a sandbox. An entry still written with `path` or `permissions.run` is refused; `crunes migrate` rewrites it.
+`deny` is available alongside `allow` in either block and is checked first. An isolate rune can declare `"allow": ["*"]` for unrestricted access across all capabilities, with `deny` still enforcing exclusions (e.g. `"allow": ["*"], "deny": ["fs.write:.env*"]`). A script rune — a `run` command that is not a `*.rune.js` module — runs natively with full access, so crunes refuses grants on it rather than imply a sandbox. An entry still written with `path` or `permissions.run` is refused.
 
 ## Batching is a separate gate
 
