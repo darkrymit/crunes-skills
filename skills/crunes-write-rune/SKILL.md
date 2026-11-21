@@ -151,14 +151,7 @@ Crunes resolves the interpreter automatically:
 - **Program on PATH or direct executable**: Invoked directly.
 
 ### What the script receives
-- **Working directory**: The project root.
-- **Environment variables**:
-  - `CRUNES_PROJECT_ROOT`: Absolute project root path.
-  - `CRUNES_RUNE_KEY`: The key the rune was invoked by.
-  - `CRUNES_LIFECYCLE`: `run`.
-  - `CRUNES_VARS`: Entry `vars` as JSON string (`{}` if none).
-  - `CRUNES_ARGS`: Parsed arguments JSON (only when an `args` schema is declared).
-- **Arguments**: Passed directly to the script (prefixed by `argv` if configured).
+Runs with cwd at the project root, `argv` + caller arguments, and env vars: `CRUNES_PROJECT_ROOT` (absolute path), `CRUNES_RUNE_KEY`, `CRUNES_LIFECYCLE` (`run`), `CRUNES_VARS` (`vars` JSON or `{}`), and `CRUNES_ARGS` (parsed args JSON, only when `args` schema is declared).
 
 ### Argument validation & schemas
 - **Without schema**: All arguments pass through unchanged, including `--help`.
@@ -195,12 +188,9 @@ If a rune fails on a capability rather than a bug, go to `crunes-permissions`.
 
 ## Deliberately not in this file
 
-`@utils` function signatures and sandbox globals are omitted on purpose — they change per release, and the CLI prints the current set:
-
+`@utils` signatures and sandbox globals change per release; read them from the CLI instead of recalling:
 ```bash
 crunes -p docs utils            # namespaces available
 crunes -p docs utils <ns>       # signatures for one namespace
 crunes -p docs globals          # what exists without importing anything
 ```
-
-Read those rather than recalling a signature. A namespace you remember may have been renamed, and one you have not heard of may now exist.
