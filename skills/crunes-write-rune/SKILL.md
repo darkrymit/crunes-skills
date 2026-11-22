@@ -14,19 +14,19 @@ Crunes supports two execution tiers. Assumes `crunes >= 0.10.0` — check with `
 
 ```bash
 # Isolate rune (sandboxed ESM)
-crunes -p -y create <key> --format markdown     # writes .crunes/runes/<key>.rune.js
+crunes -p -y create <key> --format markdown     # writes .crunes/runes/<key>/src/index.rune.js + test/<key>.test.js
 
 # Script rune (native process)
-crunes -p -y create <key> --lang bash           # writes .crunes/runes/<key>.sh
-crunes -p -y create <key> --lang python         # writes .crunes/runes/<key>.py
-crunes -p -y create <key> --lang node           # writes .crunes/runes/<key>.js
+crunes -p -y create <key> --lang bash           # writes .crunes/runes/<key>/src/index.sh + test/<key>.test.js
+crunes -p -y create <key> --lang python         # writes .crunes/runes/<key>/src/index.py + test/<key>.test.js
+crunes -p -y create <key> --lang node           # writes .crunes/runes/<key>/src/index.js + test/<key>.test.js
 
 # From a template
 crunes -p template list
 crunes -p template apply <template> --as <key>
 ```
 
-`create` writes the file and registers its `run` block in `.crunes/config.json`. Pass `-g` to scaffold globally under `~/.crunes/` instead.
+`create` writes the `{src,test}/` mini-project and registers its `run` block in `.crunes/config.json` (or `.crunes-plugin/plugin.json` when inside a plugin; pass `--plugin` or `--project` if both exist, or `-g` for `~/.crunes/`).
 
 ## Imports
 

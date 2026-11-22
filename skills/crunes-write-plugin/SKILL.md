@@ -23,7 +23,8 @@ That produces:
 <name>/
   .crunes-plugin/plugin.json         rune and template declarations, permissions
   .crunes-plugin/marketplace.json    the marketplace entry for this plugin
-  runes/example.rune.js
+  src/index.rune.js                  1-rune plugin entrypoint (--multi puts runes under runes/example/{src,test}/)
+  test/<name>.test.js                unit + E2E tests
   templates/example-template.js
   README.md  CHANGELOG.md
 ```
@@ -40,7 +41,7 @@ Note the directory is `.crunes-plugin/`. Nothing is found by convention: each ru
       "name": "Example Rune",
       "description": "Replace with your rune description",
       "run": {
-        "command": "runes/example.rune.js",
+        "command": "src/index.rune.js",
         "permissions": { "allow": [], "deny": [] }
       }
     }
