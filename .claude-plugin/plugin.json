@@ -1,6 +1,6 @@
 {
   "name": "crunes-skills",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "Agent skills for writing and running crunes — sandboxed project-local scripts for AI coding agents.",
   "author": {
     "name": "DarkRymit"

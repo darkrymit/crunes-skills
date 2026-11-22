@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.2] - 2026-11-22
+
+### Changed
+- **Unified {src,test}/ rune layout**: Update `crunes-write-plugin` and `crunes-write-rune` for `{src,test}/` scaffolding and `--multi` / `--plugin` / `--project` flags
+
+---
+
 ## [0.10.1] - 2026-11-21
 
 ### Removed
