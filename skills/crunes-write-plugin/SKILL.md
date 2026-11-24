@@ -5,7 +5,7 @@ description: Use when packaging runes into a crunes plugin, writing a plugin man
 
 # Writing Plugins
 
-A plugin packages runes and templates so other projects can install them. Assumes `crunes >= 0.10.0` — check with `crunes --version`.
+A plugin packages runes and templates so other projects can install them. Assumes `crunes >= 0.12.0` — check with `crunes --version`.
 
 Reach for a plugin only when the logic is *not* specific to one project. Anything that reads this repo's layout, its config, or its conventions belongs in `.crunes/runes/` as a local rune. A plugin earns its packaging when several projects would install the same thing.
 

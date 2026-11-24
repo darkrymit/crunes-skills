@@ -5,7 +5,7 @@ description: Use when creating a new rune, editing an existing one, scaffolding 
 
 # Writing Runes
 
-Crunes supports two execution tiers. Assumes `crunes >= 0.10.0` — check with `crunes --version`.
+Crunes supports two execution tiers. Assumes `crunes >= 0.12.0` — check with `crunes --version`.
 
 - **Isolate Runes**: Sandboxed ESM modules (`.rune.js`) executed inside an `isolated-vm` V8 isolate. Zero Node built-ins; all I/O goes through `@utils`, and capabilities are strictly governed by permission grants in `.crunes/config.json`. Ideal for portable utilities, data extraction, and marketplace plugins.
 - **Script Runes**: Native scripts (`bash`, `python`, `node`) or direct CLI programs. Run with the caller's full native permissions (no permission grants allowed). Ideal for host environment tooling, git wrappers, complex shell pipelines, or scripts requiring project packages/virtualenvs.
@@ -30,7 +30,7 @@ crunes -p template apply <template> --as <key>   # a script template is printed 
 
 ## Imports
 
-Four rules, and they are absolute:
+Five rules, and they are absolute:
 
 - `@utils` — always available.
 - `./relative` — resolved against the rune file. Plugin runes need no grant; project runes need an `fs.read` permission covering the imported file.
