@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.12.0] - 2026-11-24
+
+### Changed
+- **Template folders**: `crunes-write-plugin` and `crunes-write-rune` cover folder templates and script approval, with a `crunes >= 0.12.0` floor
+
+### Fixed
+- **Relative imports**: Project runes need an `fs.read` grant for `./relative`
+
+---
+
 ## [0.10.2] - 2026-11-22
 
 ### Changed
