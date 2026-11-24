@@ -23,7 +23,7 @@ crunes -p -y create <key> --lang node           # writes .crunes/runes/<key>/src
 
 # From a template
 crunes -p template list
-crunes -p template apply <template> --as <key>
+crunes -p template apply <template> --as <key>   # a script template is printed and needs -y (crunes -p -y …) after review
 ```
 
 `create` writes the `{src,test}/` mini-project and registers its `run` block in `.crunes/config.json` (or `.crunes-plugin/plugin.json` when inside a plugin; pass `--plugin` or `--project` if both exist, or `-g` for `~/.crunes/`).
@@ -33,7 +33,7 @@ crunes -p template apply <template> --as <key>
 Four rules, and they are absolute:
 
 - `@utils` — always available.
-- `./relative` — always available, resolved against the rune file.
+- `./relative` — resolved against the rune file. Plugin runes need no grant; project runes need an `fs.read` permission covering the imported file.
 - `@project/path` — the project root; requires an `fs.read` permission covering that path.
 - `@plugin/path` — plugin runes only; resolves from the plugin's own root.
 - `node:fs`, `node:path`, and every other `node:*` — **always blocked.** Use the `@utils` equivalent.

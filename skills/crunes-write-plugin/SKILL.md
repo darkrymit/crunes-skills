@@ -25,7 +25,7 @@ That produces:
   .crunes-plugin/marketplace.json    the marketplace entry for this plugin
   src/index.rune.js                  1-rune plugin entrypoint (--multi puts runes under runes/example/{src,test}/)
   test/<name>.test.js                unit + E2E tests
-  templates/example-template.js
+  templates/example-template/        {src,test}/ folder copied whole by template apply (one src/index.* entry; a script needs approval)
   README.md  CHANGELOG.md
 ```
 
