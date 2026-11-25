@@ -67,7 +67,8 @@ export function args(builder) {
 }
 
 export async function run(args) {
-  if (args.help) return rune.helpSection()
+  const stop = rune.guard(args)
+  if (stop) return stop
   if (args.$command === 'remote add') {
     return section.create('result', { type: 'markdown', content: md.p(`${args.name} -> ${args.url}`) })
   }
@@ -87,10 +88,13 @@ This is where most mistakes happen. Inside `run(args)`:
 | `args.$raw` | The original unparsed argument array. |
 | `args.name` | A positional declared as `<name>` maps to its own key automatically. |
 
-Two consequences worth internalising:
+Three consequences worth internalising:
 
-- **Unknown commands do not error.** They fall through to root, so detect them yourself with `args.$command === '' && args.$rest.length > 0`.
-- **`--help` is not intercepted by the runner.** Declare `.option('-h, --help', ...)` and return `rune.helpSection()` at the top of `run`, or `crunes run <key> --help` will execute the rune for real. `rune.helpText()` returns the same content as a plain string.
+- **Unknown commands do not error.** They fall through to root (`args.$command === '' && args.$rest.length > 0`).
+- **Unknown options do not error.** Undeclared flags (e.g. `--bogus`) are attached to `args` by `yargs-parser`.
+- **`--help` is not intercepted by the runner.** Declare `.option('-h, --help', 'Show help')` and guard at the **top** of `run` (before any command dispatch or I/O), or `crunes run <key> <cmd> --help` will execute the command for real.
+
+Use `rune.guard(args, opts?)` at the top of `run(args)` to enforce `unknownCommand` (with fuzzy `Did you mean?` using `rune.key()`) -> `args.help` (`rune.helpSection(args.$command)`) -> `unknownOptions` -> missing root command -> `missingPositionals` in safe order. Any check can be toggled off (e.g. `rune.guard(args, { unknownOptions: false })`), or composed individually via `rune.unknownCommand(args)`, `rune.unknownOptions(args)`, and `rune.missingPositionals(args)`.
 
 If you omit `args()` entirely, positionals still arrive in `args._`.
 
